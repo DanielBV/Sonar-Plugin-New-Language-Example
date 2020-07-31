@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<modelVersion>4.0.0</modelVersion>
+
+<groupId>org.sonarsource.plugins.example</groupId>
+<artifactId>mylanguage-example-plugin</artifactId>
+<packaging>sonar-plugin</packaging>
+<version>1.0-SNAPSHOT</version>
+
+<name> Example Plugin for a new language (SonarQube 7.9.x LTS)</name>
+<description>Example of a plugin that adds a new language and a rule for it</description>
+
+<properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
+    <junit.version>4.13</junit.version>
+    <sonar.version>7.9</sonar.version>
+</properties>
+
+<dependencies>
+
+    <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>${junit.version}</version>
+        <scope>test</scope>
+    </dependency>
+
+     <dependency>
+        <groupId>org.sonarsource.sonarqube</groupId>
+        <artifactId>sonar-plugin-api</artifactId>
+        <version>${sonar.version}</version>
+        <scope>provided</scope>
+    </dependency>
+
+
+
+</dependencies>
+
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.sonarsource.sonar-packaging-maven-plugin</groupId>
+            <artifactId>sonar-packaging-maven-plugin</artifactId>
+            <version>1.18.0.372</version>
+            <extensions>true</extensions>
+            <configuration>
+                <pluginKey>mylanguage-plugin</pluginKey>
+                <pluginClass>org.sonar.mylanguage.MyLanguagePlugin</pluginClass>
+            </configuration>
+        </plugin>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>3.8.0</version>
+        </plugin>
+        <plugin>
+            <!-- UTF-8 bundles are not supported by Java, so they must be converted during build -->
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>native2ascii-maven-plugin</artifactId>
+            <version>1.0-beta-1</version>
+            <executions>
+                <execution>
+                    <goals>
+                        <goal>native2ascii</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+
+    </plugins>
+</build>
+
+</project>
