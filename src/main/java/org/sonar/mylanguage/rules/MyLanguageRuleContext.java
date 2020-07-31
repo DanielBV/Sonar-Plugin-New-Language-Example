@@ -1,4 +1,6 @@
-package org.sonar.mylanguage.plugin;
+package org.sonar.mylanguage.rules;
+
+import org.sonar.mylanguage.plugin.Issue;
 
 import java.util.ArrayList;
 import java.util.List;

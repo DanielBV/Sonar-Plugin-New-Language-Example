@@ -3,7 +3,6 @@ package org.sonar.mylanguage.rules;
 
 import org.sonar.check.Rule;
 import org.sonar.mylanguage.plugin.Issue;
-import org.sonar.mylanguage.plugin.MyLanguageRuleContext;
 
 /**
  * A rule that checks that the file isn't empty

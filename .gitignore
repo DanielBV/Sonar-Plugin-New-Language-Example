@@ -3,3 +3,4 @@ target/
 .code/
 *.class
 .scannerwork/
+*.iml

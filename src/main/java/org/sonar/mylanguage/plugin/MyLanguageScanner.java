@@ -12,6 +12,7 @@ import org.sonar.api.rule.RuleKey;
 import org.sonar.api.utils.log.Logger;
 import org.sonar.api.utils.log.Loggers;
 import org.sonar.mylanguage.rules.MyLanguageCheck;
+import org.sonar.mylanguage.rules.MyLanguageRuleContext;
 
 import java.io.IOException;
 import java.util.List;
