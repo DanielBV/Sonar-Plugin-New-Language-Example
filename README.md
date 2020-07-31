@@ -16,20 +16,20 @@ List of relevant terms used across the plugin:
 * **org.sonar.mylanguage**: Includes the two classes that act as the entry point of the plugin: `MyLanguagePlugin` and `MyLanguageSquidSensor`.
 * **plugin**: Contains the classes associated with the plugin.
 * **rules**: Contains (you guessed it) the classes that implements the rules.
-* **parser?**: This template doesn't contain a parser. But if you are going to parse anything serious you should add one.
+* **parser?**: This template doesn't contain a parser. But if you are going to analyze anything serious you should add one.
 
 The classes `MyLanguagePlugin`, `MyLanguage`, `MyLanguageQualityProfile` and `MyLanguageRuleRepository` declare what the plugins do. Meanwhile `MyLanguageSquidSensor` contains some configuration and also is the entry point of the plugin. You can implement the method `execute` as you wish. I extracted the necessary configuration from the context and delegated the analysis to the class `MyLanguageScanner`.
 
 ## How to use it
 The plugin is already functional. Before you change things you should [install it in a Sonarqube instance and check it's working](#installing-the-plugin). 
 
-To create your own plugin from it you should change several things. To begin with, replace every "MyLanguage" with the name of the language in the name and contents of each file.
+To create your own plugin from it you should change several things. To begin with, replace every "MyLanguage" with the name of the language you want to analyze.
 
-Also you probably want to add a parser to the plugin. You can use any parser you want (SSLR, ANTLR, Javacc, etc). The parser should be called from the method `scanFile` of the file `MyLanguageScanner.java`.
+Also you probably want to add a parser to the plugin. You can use any parser you want (SSLR, ANTLR, Javacc, etc). The parser should be called from the method `scanFile` of the file `MyLanguageScanner.java`. The documentation has an entry called [Supporting New Languages](https://docs.sonarqube.org/latest/extend/new-languages/) that explains how to add a new language. This template covers the step 5, and lays down the foundation to call a parser and create new rules.
 
 
 ### Adding new rules
-Every rule must implement the class `MyLanguageCheck`. This inteface contains a single method, `scan`, which takes an argument of type `MyLanguageRuleContext`. This class must contain all the information that every rule needs , so you should store all the information the rules need in that object. The Rule Context also includes the issues raised by rules.
+Every rule must implement the interface `MyLanguageCheck`. It contains a single method, `scan`, which takes an argument of type `MyLanguageRuleContext`. This class must contain all the information that every rule needs , so you should store all the information the rules need in that object. The Rule Context also includes the issues raised by rules.
 
 Then create a class that implements `MyLanguageCheck`. Finally the rule must be added to the Rule Repository and activated in the quality profile.
 
