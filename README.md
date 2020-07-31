@@ -1,13 +1,13 @@
-# Example of a Sonar Plugin to add a New language
+# Example of a SonarQube Plugin to add a New language
 
-This repository contains a template to create a plugin of Sonarqube that adds a new language. **The plugin is functional**, it just checks files with the extension .ml (my language) and it raises an exception if the file is empty.
+This repository contains a template to create a Sonarqube plugin that adds a new language. **The plugin is functional**, it just checks files with the extension .ml (my language) and it raises an exception if the file is empty.
 
 ## Glossary
 List of relevant terms used across the plugin:
 * **Rule**: A standard or condition that the code should follow. If it doesn't the plugin raises an **issue**. For example  ["=+" should not be used instead of "+="](https://rules.sonarsource.com/java/RSPEC-2757).
-* **Check**: Synonym for key. Classes that represent rules often end with the suffix "Check".
+* **Check**: Synonym for rule. Classes that represent rules often end with the suffix "Check".
 * **Key**: Unique identifier for something. Several things require a unique id, like rules, repositories, quality profiles, and languages.
-* **Rule repository**: A set of rules. Plugins can create multiple sets, but this one uses only one.
+* **Rule repository**: A set of rules. Plugins can create multiple sets, but this one defines one.
 * **Quality Profile**: A set of **active** rules. The user can creaate multiple quality profiles to configure which rules should be active in a specific project. Every language must have a default quality profile.
 * **Squid**: [Apparently squid means SonarQube Unique ID](https://stackoverflow.com/questions/50842908/what-does-the-squid-prefix-mean-in-sonarlint-rules). The name "MyLanguageSquidSensor" comes from [JavaSquidSensor.java in the plugin SonarJava](https://github.com/SonarSource/sonar-java/blob/master/sonar-java-plugin/src/main/java/org/sonar/plugins/java/JavaSquidSensor.java)
 * **Sensor**: The entry point of the plugin.
@@ -16,21 +16,22 @@ List of relevant terms used across the plugin:
 * **org.sonar.mylanguage**: Includes the two classes that act as the entry point of the plugin: `MyLanguagePlugin` and `MyLanguageSquidSensor`.
 * **plugin**: Contains the classes associated with the plugin.
 * **rules**: Contains (you guessed it) the classes that implements the rules.
+* **parser?**: This template doesn't contain a parser. But if you are going to parse anything serious you should add one.
 
 The classes `MyLanguagePlugin`, `MyLanguage`, `MyLanguageQualityProfile` and `MyLanguageRuleRepository` declare what the plugins do. Meanwhile `MyLanguageSquidSensor` contains some configuration and also is the entry point of the plugin. You can implement the method `execute` as you wish. I extracted the necessary configuration from the context and delegated the analysis to the class `MyLanguageScanner`.
 
 ## How to use it
-The plugin is already functional. To create your own plugin from it you should change several things. To begin with, replace every "MyLanguage" with the name of the language in the name and contents of each file.
+The plugin is already functional. Before you change things you should [install it in a Sonarqube instance and check it's working](#installing-the-plugin). 
+
+To create your own plugin from it you should change several things. To begin with, replace every "MyLanguage" with the name of the language in the name and contents of each file.
 
 Also you probably want to add a parser to the plugin. You can use any parser you want (SSLR, ANTLR, Javacc, etc). The parser should be called from the method `scanFile` of the file `MyLanguageScanner.java`.
 
 
 ### Adding new rules
-Every rule takes the same data object (a  `MyLanguageRuleContext`). So you should store all the information the rules need in that object.
+Every rule must implement the class `MyLanguageCheck`. This inteface contains a single method, `scan`, which takes an argument of type `MyLanguageRuleContext`. This class must contain all the information that every rule needs , so you should store all the information the rules need in that object. The Rule Context also includes the issues raised by rules.
 
-Then create a class that implements `MyLanguageCheck`. The method `scan` should check if the rule is broken, and if it is, it should generate an issue and sotore it in the `MyLanguageRuleContext`.
-
-Once the class is implemented, it must be added to the Rule Repository and activated in the quality profile.
+Then create a class that implements `MyLanguageCheck`. Finally the rule must be added to the Rule Repository and activated in the quality profile.
 
 #### Addding a rule to the Rule Repository
 There are three ways of adding a rule to the Rule Repository:
@@ -38,13 +39,13 @@ There are three ways of adding a rule to the Rule Repository:
 2. Loading them from a XML file
 3. Using annotations
 
-This template uses the last one. I recommend using this one because it keeps the metadata close to the data, and it's easier to implement. For the record, to add the rule manually you can do something like:
+This template uses the last one. I recommend using it because it keeps the metadata close to the data, and it's easier to implement. For the record, to add the rule manually you can do something like:
 
 ```
 repository.createRule(LowerCaseCheck.CHECK_KEY).setName("LowerCase").setMarkdownDescription("Every symbol should be in lower case");
 ```
 
-To use annotations, you need to add the `@Rule` decorator. Like the class `EmptyFileCheck`. Afterwards, add the rule to the method `getChecks` inside `MyLanguageRuleRepository`. Like this:
+To use annotations, you need to add the `@Rule` decorator,  like in the class `EmptyFileCheck`. Afterwards, add the rule to the method `getChecks` inside `MyLanguageRuleRepository`. Like this:
 
 ```
 set.add(MyNewRule.class);
@@ -56,12 +57,15 @@ When you add the rule to the repository, it becomes available for use. But to us
 It's easy. Just add the line:
 
 ```
- profile.activateRule(MyLanguageRuleRepository.REPOSITORY_KEY, MyNewRule.CHECK_KEY);
+profile.activateRule(MyLanguageRuleRepository.REPOSITORY_KEY, MyNewRule.CHECK_KEY);
 ```
 
 Done, reinstall the plugin and the rule should be work.
 
 
+#### Things to take into account
+* Rules shouldn't depend on each other. Sonarqube doesn't guarantee the order in which the rules are injected, and the user could disable rules. Therefore each rule must be independent.
+* Each MyLanguageRuleContext should represent one file. You could modify it to represent several, but it isn't intended to work that way.
 
 
 ### Adding parameters
@@ -120,6 +124,6 @@ The results of the analysis should contain a code smell in the file `empty.ml`.
 
 ## Troubleshooting
 ### The plugin isn't detecting the files
-The plugin only analyzes files that have the language extension. This extension can be found in the file attribute `DEFAULT_FILE_SUFFIXES` of the file `MyLanguage.java`. 
+The plugin only analyzes files that have the language extensions of the language. This can be modified in the attribute `DEFAULT_FILE_SUFFIXES` of the file `MyLanguage.java`. 
 
 Remember to include the dot, write `.py` instead of `py`.
